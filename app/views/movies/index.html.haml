@@ -1,9 +1,17 @@
 -#  This file is app/views/movies/index.html.haml
 %h2 All Movies
 
+= form_tag movies_path, :method => :get do
+  Include:
+  - @all_ratings.each do |rating|
+    = rating
+    = check_box_tag "ratings[#{rating}]", rating, checked = true
+  = submit_tag 'Refresh'
+
 %table#movies.table.table-striped.col-md-12
   %thead
     %tr
+    -# Conditionals for highliting boxes
     -if params[:sort_param] == 'title'
       %th.hilite= link_to "Movie Title", movies_path(:sort_param => "title")
       %th Rating

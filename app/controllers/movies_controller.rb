@@ -13,23 +13,34 @@ class MoviesController < ApplicationController
   end
 
   def index
+    # Checkboxes
+    
+    query_ratings = []
+    @all_ratings = Movie.return_ratings
+    if params.has_key?(:ratings)
+      @all_ratings.each do |rating|
+        if  params[:ratings][:"#{rating}"]
+          query_ratings.append(params[:ratings][:"#{rating}"])  
+        end
+      end
+    end
+    
+    # Query
+    @movies = []
+    query_ratings.each do |query|
+      found_movie = Movie.all.where(rating: "#{query}")
+      found_movie.each do |movie|
+        @movies.append(movie)
+        puts movie.title
+      end
+    end
+    
+    # Sorting parameters
     if params[:sort_param] == "title"
       @movies = Movie.order(:title).all
     elsif params[:sort_param] == "date"
       @movies = Movie.order(:release_date).all
-    else
-      @movies = Movie.all
     end
-    
-    
-    if params[:sort_param] == "title"
-      puts "title"
-    elsif params[:sort_param] == "date"
-      puts "date"
-    else
-      puts "test"
-    end
-    
   end
 
   def new
