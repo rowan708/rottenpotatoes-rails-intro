@@ -3,29 +3,35 @@
 
 = form_tag movies_path, :method => :get do
   Include:
+  
   - @all_ratings.each do |rating|
     = rating
-    = check_box_tag "ratings[#{rating}]", rating, checked = true
-  = submit_tag 'Refresh'
+    -if params.has_key?(:ratings)
+      = check_box_tag "ratings[#{rating}]", rating, checked = params[:ratings].has_key?("#{rating}")
+    -else   
+      = check_box_tag "ratings[#{rating}]", rating, checked = true
+  - session[:sort_param] = params[:sort_param]
+  = submit_tag "Refresh"
 
 %table#movies.table.table-striped.col-md-12
   %thead
     %tr
     -# Conditionals for highliting boxes
+    -params[:sort_param] = session[:sort_param]
     -if params[:sort_param] == 'title'
-      %th.hilite= link_to "Movie Title", movies_path(:sort_param => "title")
+      %th.hilite= link_to "Movie Title", movies_path(:sort_param => "title", :ratings => session[:ratings])
       %th Rating
-      %th.unhilite= link_to "Release Date", movies_path(:sort_param => "date")
+      %th.unhilite= link_to "Release Date", movies_path(:sort_param => "date", :ratings => session[:ratings])
       %th More Info
     -elsif params[:sort_param] == 'date'
-      %th.unhilite= link_to "Movie Title", movies_path(:sort_param => "title")
+      %th.unhilite= link_to "Movie Title", movies_path(:sort_param => "title", :ratings => session[:ratings])
       %th Rating
-      %th.hilite= link_to "Release Date", movies_path(:sort_param => "date")
+      %th.hilite= link_to "Release Date", movies_path(:sort_param => "date", :ratings => session[:ratings])
       %th More Info
     -else
-      %th= link_to "Movie Title", movies_path(:sort_param => "title")
+      %th= link_to "Movie Title", movies_path(:sort_param => "title", :ratings => session[:ratings])
       %th Rating
-      %th= link_to "Release Date", movies_path(:sort_param => "date")
+      %th= link_to "Release Date", movies_path(:sort_param => "date", :ratings => session[:ratings])
       %th More Info
   %tbody
     - @movies.each do |movie|

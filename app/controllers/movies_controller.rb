@@ -13,8 +13,26 @@ class MoviesController < ApplicationController
   end
 
   def index
-    # Checkboxes
+    #Load Session and redirect if required
+    redirect = 0
+    if session.has_key?(:ratings) && !params[:ratings]
+      params[:ratings] = session[:ratings]
+      redirect = 1
+    end
+    if !params[:sort_param]
+      params[:sort_param] = session[:sort_param]
+      redirect = 1
+    end
     
+    #Redirect (caused issues)
+    #if redirect
+    #  redirect = 0
+    #  flash.keep
+    #  redirect_to movies_path(:sort_param => session[:sort_param], :ratings => session[:ratings])
+    #end
+    
+    
+    # Checkboxes
     query_ratings = []
     @all_ratings = Movie.return_ratings
     if params.has_key?(:ratings)
@@ -31,16 +49,20 @@ class MoviesController < ApplicationController
       found_movie = Movie.all.where(rating: "#{query}")
       found_movie.each do |movie|
         @movies.append(movie)
-        puts movie.title
       end
     end
     
     # Sorting parameters
     if params[:sort_param] == "title"
-      @movies = Movie.order(:title).all
+      @movies = @movies.sort_by { |movie| movie.title}
     elsif params[:sort_param] == "date"
-      @movies = Movie.order(:release_date).all
+      @movies = @movies.sort_by { |movie| movie.release_date}
     end
+    
+    #Save session
+    session[:ratings] = params[:ratings]
+    session[:sort_param] = params[:sort_param]
+    
   end
 
   def new
